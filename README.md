@@ -52,7 +52,7 @@ Here, you can change the Short Factor and Long Factor as you wish and produce mo
 [TURKISH]
 
 ◙ GENEL BAKIŞ
-Merhaba Yatırımcılar ve Yatırımcılar... Bu Gösterge, Scott Cong'un Stocks & Emtia Eylül sayısındaki “VAcc: Hız ve İvmeye Dayalı Bir Momentum Göstergesi” başlıklı makalesine odaklanmaktadır. Bu göstergeden faydalanabilmeniz için bir ticaret stratejisi de ekledim. Öncelikle göstergenin bize neler sunduğuna ve mantığının ne olduğuna bakalım. Öncelikle stratejinin mantığına odaklanalım.
+Merhaba Yatırımcılar ve Traderlar... Bu Gösterge, Scott Cong'un Stocks & Emtia Eylül sayısındaki “VAcc: Hız ve İvmeye Dayalı Bir Momentum Göstergesi” başlıklı makalesine odaklanmaktadır. Bu göstergeden faydalanabilmeniz için bir ticaret stratejisi de ekledim. Öncelikle göstergenin bize neler sunduğuna ve mantığının ne olduğuna bakalım. Öncelikle stratejinin mantığına odaklanalım.
 
 ◙ KAVRAMLAR
 İşte kullanımı kolay, duyarlı ve kesin bazı basit fizik kavramlarına dayanan yeni bir gösterge. Nasıl hesaplanacağını ve kullanılacağını öğrenin.
