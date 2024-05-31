@@ -1,0 +1,100 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © _Neo
+// Stocks & Commodities V. 41:09 (8–15): VAcc: A Momentum Indicator Based On Velocity And Acceleration by Scott Cong, PhD
+
+//@version=5
+
+indicator(title= 'Velocity And Acceleration with Strategy: Traders Magazine', shorttitle = 'VAcc', overlay = false)
+
+string G01 = 'Parameters Configuration:'
+string T00 = 'Source Series:'
+string T01 = 'Sample Period:'
+string T02 = 'EMA Smoothing:'
+string T03 = 'Scale Factor:'
+string G02 = 'StyLe Configuration:'
+string T04 = 'Histogram:'
+string T05 = 'Velocity:'
+string T06 = 'Display Bands?'
+string T07 = 'AV Factor Long'
+string T08 = 'AV Factor Short'
+float src   = input.source(    hl2, T00, group=G01)
+int length1 = input.int(          21, T01, group=G01)
+int length2 = input.int(          8, T02, group=G01)
+float scale_factor = input.float(0.382, T03, group=G01)
+color cHDO = input.color(color.rgb(227, 24, 51)  , T04, '', 'H', G02)
+color cHUP= input.color(color.rgb(32, 29, 216)  ,  '', '', 'H', G02)
+color cV1  = input.color(#0b0b0be7, T05, '', 'V', G02)
+color cV2  = input.color(color.rgb(143, 187, 55, 28),  '', '', 'V', G02)
+bool showb = input.bool(       false, T06, '',  '', G02)
+float avfactorLong = input(0.1, T07, group = G01)
+float avfactorShort = input(-0.1, T08, group = G01)
+
+// @function Relatively weighted average where the nearer
+//  price has the largest influence.
+// @param src       Series to be averaged.
+// @param length    Length of the sample.
+// @returns Averaged value of the sampled series.
+weighted_avg (float src, int length) =>
+    float sum = 0.0
+    for _i = 1 to length
+        float diff = (src - src[_i]) / _i
+        sum += diff
+    sum /= length
+
+
+// @function Calculate Velocity and Acceleration.
+// @param src       Series to be averaged.
+// @param period    Length of the sample.
+// @param smoothing Length of the Smoothing.
+// @returns Tuple with Velocity and Acceleration.
+VAcc (float src, int period, int smoothing) =>
+    float vel = ta.ema(weighted_avg(src, period), smoothing)
+    float acc = weighted_avg(vel, period)
+    [100.0 * vel, 100.0 * acc]
+
+
+[av, acc] = VAcc(src, length1, length2)
+av /= (length1 * scale_factor)
+PSH = plot.style_columns
+hist_col = acc >= 0.0 ? cHUP : cHDO
+
+
+plot(acc, 'Avg. Acceleration', hist_col, 2, PSH)
+plot(av  , 'Avg. Velocity', cV2, 5)
+plot(av  , 'Avg. Velocity', cV2, 3)
+plot(av  , 'Avg. Velocity', cV1, 1)
+hline(0)
+
+
+float upper = av
+float lower = av
+switch
+    av > 0 => upper += (nz(upper[1], 0.0) - av) * 0.5
+    => upper := nz(upper[1])
+switch
+    av < 0 => lower += (nz(lower[1], 0.0) - av) * 0.5
+    => lower := nz(lower[1])
+upband = ta.highest(ta.ema(upper, length2), length1)
+doband = ta.lowest(ta.ema(lower, length2), length1)
+
+
+display_b = showb ? display.all : display.none
+plot(upband, 'Upper Band', #787b8699, display=display_b)
+plot(doband, 'Lower Band', #787b8699, display=display_b)
+
+//Alert & Signals
+AlKosul = acc > avfactorShort and av > avfactorLong 
+SatKosul = acc <  avfactorShort and av < avfactorShort
+
+last_signal = 0
+last_signal := AlKosul ? 1 : SatKosul ? -1 : last_signal[1]
+long_final = AlKosul and (nz(last_signal[1]) == 0 or nz(last_signal[1]) == -1)
+short_final = SatKosul and (nz(last_signal[1]) == 0 or nz(last_signal[1]) == 1)
+alertcondition(long_final, title='AL', message='VAcc AL SİNYALİ VERDİ!')
+alertcondition(short_final, title='SAT', message='VAcc SAT SİNYALİ VERDİ!')
+
+plotshape(long_final, text = 'BUY', textcolor = hist_col, location = location.belowbar, force_overlay = true, style = shape.triangleup, color= hist_col, size = size.small)
+plotshape(short_final, text = 'SELL', textcolor = hist_col, location = location.abovebar, force_overlay = true, style = shape.triangledown, color = hist_col, size = size.small)
+
+
+
